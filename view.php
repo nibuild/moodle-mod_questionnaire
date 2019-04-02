@@ -114,15 +114,26 @@ if (!$questionnaire->is_active()) {
 
 } else if ($questionnaire->user_can_take($USER->id)) {
     if ($questionnaire->questions) { // Sanity check.
+        $viewURL = '';
+        $viewText = '';
+        $viewExtra = '';
+        $redirectText = '';
         if (!$questionnaire->user_has_saved_response($USER->id)) {
-            $questionnaire->page->add_to_page('complete',
-                '<a href="'.$CFG->wwwroot.htmlspecialchars('/mod/questionnaire/complete.php?' .
-                'id='.$questionnaire->cm->id).'">'.get_string('answerquestions', 'questionnaire').'</a>');
+            $viewURL = $CFG->wwwroot.htmlspecialchars('/mod/questionnaire/complete.php?' .
+                'id='.$questionnaire->cm->id);
+            $viewText = get_string('answerquestions', 'questionnaire');
+            $redirectText = get_string('redirecttosurvey', 'questionnaire');
         } else {
-            $resumesurvey = get_string('resumesurvey', 'questionnaire');
-            $questionnaire->page->add_to_page('complete',
-                '<a href="'.$CFG->wwwroot.htmlspecialchars('/mod/questionnaire/complete.php?' .
-                'id='.$questionnaire->cm->id.'&resume=1').'" title="'.$resumesurvey.'">'.$resumesurvey.'</a>');
+            $viewURL = $CFG->wwwroot.htmlspecialchars('/mod/questionnaire/complete.php?' .
+                'id='.$questionnaire->cm->id.'&resume=1');
+            $viewText = get_string('resumesurvey', 'questionnaire');
+            $viewExtra = 'title="' . $viewText . '"';
+            $redirectMsg = get_string('redirecttosurveyresume', 'questionnaire');
+        }
+        if(course_get_format($course)->get_format() == 'singleactivity' && get_config('questionnaire', 'redirectifsingleactivitycourse') && $questionnaire->count_submissions($USER->id) == 0) {
+            redirect($viewURL, $redirectMsg);
+        } else {
+            $questionnaire->page->add_to_page('complete', '<a href="' . $viewURL . '" ' . $viewExtra . '>' . $viewText . '</a>');
         }
     } else {
         $questionnaire->page->add_to_page('message', get_string('noneinuse', 'questionnaire'));
