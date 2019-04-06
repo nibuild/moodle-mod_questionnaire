@@ -128,10 +128,10 @@ if (!$questionnaire->is_active()) {
                 'id='.$questionnaire->cm->id.'&resume=1');
             $viewText = get_string('resumesurvey', 'questionnaire');
             $viewExtra = 'title="' . $viewText . '"';
-            $redirectMsg = get_string('redirecttosurveyresume', 'questionnaire');
+            $redirectText = get_string('redirecttosurveyresume', 'questionnaire');
         }
-        if(course_get_format($course)->get_format() == 'singleactivity' && get_config('questionnaire', 'redirectifsingleactivitycourse') && $questionnaire->count_submissions($USER->id) == 0) {
-            redirect($viewURL, $redirectMsg);
+        if(get_config('questionnaire', 'redirectifsingleactivitycourse') && $questionnaire->count_submissions($USER->id) == 0) {
+            redirect($viewURL, $redirectText);
         } else {
             $questionnaire->page->add_to_page('complete', '<a href="' . $viewURL . '" ' . $viewExtra . '>' . $viewText . '</a>');
         }
